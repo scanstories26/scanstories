@@ -597,7 +597,10 @@ function createAR(c) {
   const scene = document.createElement("a-scene");
   currentScene = scene;
 
-  scene.setAttribute("mindar-image", `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true;`);
+  scene.setAttribute(
+  "mindar-image",
+  `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 10;`
+);
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute("renderer", "colorManagement: true");
   scene.setAttribute("vr-mode-ui", "enabled: false");
