@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanStories | AR Invitations & Memories</title>
+
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    :root {
+      --bg: #09060f;
+      --card: rgba(255,255,255,0.08);
+      --text: #ffffff;
+      --muted: #cfc7da;
+      --gold: #ffd27d;
+      --pink: #ff5f9e;
+      --purple: #8b5cf6;
+      --danger: #ffb4b4;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,95,158,.35), transparent 35%),
+        radial-gradient(circle at top right, rgba(139,92,246,.35), transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      min-height: 100vh;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shell {
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 26px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--pink));
+      box-shadow: 0 0 22px rgba(255,210,125,.8);
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: .95;
+      margin: 0 0 20px;
+      letter-spacing: -2.5px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--gold), #fff, var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.7;
+      max-width: 660px;
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      width: 220px;
+      height: 50px;
+      padding: 0 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .2s ease, box-shadow .2s ease;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+      box-shadow: 0 18px 40px rgba(255,95,158,.25);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .feature {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 22px;
+      padding: 16px;
+      backdrop-filter: blur(16px);
+    }
+
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--gold);
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .phone {
+      width: min(390px, 100%);
+      margin-inline: auto;
+      border-radius: 40px;
+      padding: 14px;
+      background: linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 30px 80px rgba(0,0,0,.45);
+    }
+
+    .phone-screen {
+      min-height: 620px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.6)),
+        url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=900&auto=format&fit=crop') center/cover;
+      position: relative;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .phone-screen.has-customer-image {
+      background-size: cover;
+      background-position: center;
+    }
+
+    .scan-card {
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 26px;
+      padding: 18px;
+      backdrop-filter: blur(18px);
+    }
+
+    .scan-card h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .scan-card p {
+      margin: 0;
+      color: #eadff4;
+      line-height: 1.5;
+    }
+
+    .section {
+      width: min(1100px, calc(100% - 44px));
+      margin: 0 auto 70px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 34px;
+      padding: 28px;
+      backdrop-filter: blur(18px);
+    }
+
+    .section h2 { margin: 0 0 12px; font-size: 30px; }
+    .section p { color: var(--muted); line-height: 1.7; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .step {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .step b {
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      margin-bottom: 12px;
+    }
+
+    #arMode {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000;
+    }
+
+    #loader, #errorBox, #hint, #fallbackBtn, #closeAR {
+      position: fixed;
+      z-index: 10001;
+    }
+
+    #loader {
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: radial-gradient(circle at top, #2b1b4d, #000);
+      color: white;
+      font-size: 18px;
+    }
+
+    #errorBox {
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: #111;
+      color: var(--danger);
+    }
+
+    #hint {
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.62);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      display: none;
+      white-space: nowrap;
+    }
+
+    #fallbackBtn {
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--gold), #fff1bf);
+      color: #2b1608;
+      padding: 13px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      display: none;
+    }
+
+    #closeAR {
+      top: 18px;
+      right: 18px;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.6);
+      color: white;
+      font-size: 22px;
+      display: none;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px 20px 42px;
+    }
+
+    @media (max-width: 850px) {
+      .page {
+        padding: 16px;
+        align-items: flex-start;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .phone {
+        order: -1;
+        width: min(330px, 100%);
+      }
+
+      .phone-screen {
+        min-height: 520px;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 320px;
+        height: 48px;
+      }
+
+      .features, .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        width: calc(100% - 28px);
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main id="website">
+    <section class="page">
+      <div class="shell">
+        <div>
+          <div class="brand"><span class="logo-dot"></span> ScanStories AR</div>
+          <h1>Your invitation, <span class="gradient-text">brought to life.</span></h1>
+          <p class="sub">
+            Create magical AR invitations and memory frames. Scan a QR, open the camera, point at the invitation, and watch the video play directly on the card.
+          </p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="startARFromLanding()">Open AR Experience ✨</button>
+            <a class="btn btn-secondary" href="https://www.instagram.com/scanstories.in/" target="_blank">
+              <span>📸</span>
+              <span>@scanstories.in</span>
+            </a>
+          </div>
+          <div class="features">
+            <div class="feature"><strong>No App Needed</strong><span>Works directly in Chrome/Safari using WebAR.</span></div>
+            <div class="feature"><strong>Dynamic Links</strong><span>Add new customers from Google Sheets.</span></div>
+            <div class="feature"><strong>Premium Feel</strong><span>Perfect for wedding, reception and event invites.</span></div>
+          </div>
+        </div>
+
+        <div class="phone">
+          <div class="phone-screen" id="customerPreview">
+            <div class="scan-card">
+              <h2 id="previewTitle">Reception AR Invite</h2>
+              <p id="previewText">Point your camera at the invitation and experience the celebration in AR.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How it works</h2>
+      <p>ScanStories converts your printed invitation or photo frame into an interactive AR video experience.</p>
+      <div class="steps">
+        <div class="step"><b>1</b><h3>Scan QR</h3><p>Customer scans the QR code printed on the invitation or frame.</p></div>
+        <div class="step"><b>2</b><h3>Open Website</h3><p>The AR page opens directly on your website.</p></div>
+        <div class="step"><b>3</b><h3>Allow Camera</h3><p>User allows camera permission in Chrome or Safari.</p></div>
+        <div class="step"><b>4</b><h3>Watch Magic</h3><p>Video appears and sticks to the invitation image.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      © ScanStories.in — Photos Today, Stories Forever
+    </footer>
+  </main>
+
+  <div id="arMode"></div>
+  <div id="loader">✨ Loading your AR experience...</div>
+  <div id="hint">📸 Point your camera at the invitation</div>
+  <div id="errorBox"></div>
+  <a id="fallbackBtn" href="#" target="_blank">▶ Play Video Without AR</a>
+  <button id="closeAR" onclick="closeAR()">×</button>
+
+<script>
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5F5Ed7_EPFhDj13vqYaRQLSbaKB4pqWSCyZVQsaY8j1IIVOhAvbuAX1oT-MZhyr40oj3mVJDPNm_C/pub?output=csv";
+const params = new URLSearchParams(window.location.search);
+const customerId = params.get("id");
+let arStarted = false;
+let currentScene = null;
+
+function showLoader(message = "✨ Loading your AR experience...") {
+  document.getElementById("loader").innerHTML = message;
+  document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader() {
+  document.getElementById("loader").style.display = "none";
+}
+
+function showError(msg) {
+  hideLoader();
+  document.getElementById("hint").style.display = "none";
+  const box = document.getElementById("errorBox");
+  box.style.display = "flex";
+  box.innerHTML = msg;
+}
+
+function hideError() {
+  document.getElementById("errorBox").style.display = "none";
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let current = "";
+  let row = [];
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      current += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === ',' && !insideQuotes) {
+      row.push(current.trim());
+      current = "";
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (current || row.length) {
+        row.push(current.trim());
+        rows.push(row);
+        row = [];
+        current = "";
+      }
+    } else {
+      current += char;
+    }
+  }
+
+  if (current || row.length) {
+    row.push(current.trim());
+    rows.push(row);
+  }
+
+  const headers = rows.shift().map(h => h.trim());
+  return rows.filter(r => r.length && r.some(Boolean)).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
+    return obj;
+  });
+}
+
+function absolutePath(path) {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return path.replace(/^\//, "");
+}
+
+async function getCustomerData() {
+  if (!customerId) throw new Error("missing-id");
+  const response = await fetch(SHEET_CSV_URL + "&cache=" + Date.now());
+  const csv = await response.text();
+  const rows = parseCSV(csv);
+  const customer = rows.find(r => r.id === customerId);
+  if (!customer) throw new Error("customer-not-found");
+  return customer;
+}
+
+async function loadLandingPreview() {
+  if (!customerId) return;
+  try {
+    const customer = await getCustomerData();
+    const preview = document.getElementById("customerPreview");
+    const title = document.getElementById("previewTitle");
+    const text = document.getElementById("previewText");
+
+    if (customer.title) title.innerText = customer.title;
+    text.innerText = "Point your camera at this invitation and experience the celebration in AR.";
+
+    if (customer.targetImage) {
+      preview.style.backgroundImage = `linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.6)), url('${absolutePath(customer.targetImage)}')`;
+      preview.classList.add("has-customer-image");
+    }
+  } catch (e) {}
+}
+
+async function startARFromLanding() {
+  if (arStarted) return;
+
+  if (!customerId) {
+    showError(`
+      <div>
+        <h2>Customer ID Missing</h2>
+        <p>Use link like:<br><b>https://scanstories.in/?id=rahul-reception</b></p>
+      </div>
+    `);
+    return;
+  }
+
+  try {
+    showLoader();
+    hideError();
+    document.getElementById("website").style.display = "none";
+    document.getElementById("arMode").style.display = "block";
+    document.getElementById("hint").style.display = "block";
+    document.getElementById("closeAR").style.display = "block";
+
+    const customer = await getCustomerData();
+    createAR(customer);
+    arStarted = true;
+  } catch (err) {
+    if (err.message === "missing-id") {
+      showError("❌ Missing customer ID.<br>Use URL like: <b>?id=rahul-reception</b>");
+    } else if (err.message === "customer-not-found") {
+      showError("❌ Customer not found in Google Sheet.<br>Please check the ID column.");
+    } else {
+      showError("❌ Failed to load AR data.<br>Please check Google Sheet CSV link and hosting paths.");
+    }
+  }
+}
+
+function createAR(c) {
+  document.title = c.title || "ScanStories AR";
+  const arMode = document.getElementById("arMode");
+  arMode.innerHTML = "";
+
+  const scene = document.createElement("a-scene");
+  currentScene = scene;
+
+  scene.setAttribute("mindar-image", `imageTargetSrc: ${absolutePath(c.targetMind)}; autoStart: true; uiScanning: true;`);
+  scene.setAttribute("color-space", "sRGB");
+  scene.setAttribute("renderer", "colorManagement: true");
+  scene.setAttribute("vr-mode-ui", "enabled: false");
+  scene.setAttribute("device-orientation-permission-ui", "enabled: true");
+  scene.setAttribute("embedded", "");
+
+  scene.innerHTML = `
+    <a-assets>
+      <video id="ar-video"
+        src="${absolutePath(c.videoUrl)}"
+        preload="auto"
+        loop
+        crossorigin="anonymous"
+        playsinline
+        webkit-playsinline>
+      </video>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="target" mindar-image-target="targetIndex: 0">
+      <a-video
+        src="#ar-video"
+        width="${c.width || 1}"
+        height="${c.height || 0.6}"
+        position="0 0 0"
+        rotation="0 0 0">
+      </a-video>
+    </a-entity>
+  `;
+
+  arMode.appendChild(scene);
+
+  const fallback = document.getElementById("fallbackBtn");
+  fallback.href = absolutePath(c.videoUrl);
+  fallback.style.display = "block";
+
+  const video = scene.querySelector("#ar-video");
+  const target = scene.querySelector("#target");
+
+  scene.addEventListener("arReady", () => hideLoader());
+
+  scene.addEventListener("arError", () => {
+    showError("❌ Camera failed to start.<br>Please allow camera permission and open using HTTPS.");
+  });
+
+  target.addEventListener("targetFound", async () => {
+    document.getElementById("hint").innerText = "✨ AR video playing";
+    try { await video.play(); } catch (e) {}
+  });
+
+  target.addEventListener("targetLost", () => {
+    document.getElementById("hint").innerText = "📸 Point your camera at the invitation";
+    video.pause();
+  });
+}
+
+function closeAR() {
+  const video = document.querySelector("#ar-video");
+  if (video) video.pause();
+
+  document.getElementById("arMode").innerHTML = "";
+  document.getElementById("arMode").style.display = "none";
+  document.getElementById("website").style.display = "block";
+  document.getElementById("hint").style.display = "none";
+  document.getElementById("fallbackBtn").style.display = "none";
+  document.getElementById("closeAR").style.display = "none";
+  hideLoader();
+  hideError();
+  arStarted = false;
+  currentScene = null;
+}
+
+loadLandingPreview();
+</script>
+</body>
+</html>
