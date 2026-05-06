@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ScanStories | AR Invitations & Memories</title>
 
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -376,6 +377,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <main id="website">
@@ -384,9 +386,10 @@
         <div>
           <div class="brand"><span class="logo-dot"></span> ScanStories AR</div>
           <h1>Your invitation, <span class="gradient-text">brought to life.</span></h1>
-          <p class="sub">
+          <p class="sub" id="landingSubtitle">
             Create magical AR invitations and memory frames. Scan a QR, open the camera, point at the invitation, and watch the video play directly on the card.
           </p>
+
           <div class="actions">
             <button class="btn btn-primary" onclick="startARFromLanding()">Open AR Experience ✨</button>
             <a class="btn btn-secondary" href="https://www.instagram.com/scanstories.in/" target="_blank">
@@ -394,6 +397,7 @@
               <span>@scanstories.in</span>
             </a>
           </div>
+
           <div class="features">
             <div class="feature"><strong>No App Needed</strong><span>Works directly in Chrome/Safari using WebAR.</span></div>
             <div class="feature"><strong>Dynamic Links</strong><span>Add new customers from Google Sheets.</span></div>
@@ -415,6 +419,7 @@
     <section class="section">
       <h2>How it works</h2>
       <p>ScanStories converts your printed invitation or photo frame into an interactive AR video experience.</p>
+
       <div class="steps">
         <div class="step"><b>1</b><h3>Scan QR</h3><p>Customer scans the QR code printed on the invitation or frame.</p></div>
         <div class="step"><b>2</b><h3>Open Website</h3><p>The AR page opens directly on your website.</p></div>
@@ -436,9 +441,11 @@
   <button id="closeAR" onclick="closeAR()">×</button>
 
 <script>
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5F5Ed7_EPFhDj13vqYaRQLSbaKB4pqWSCyZVQsaY8j1IIVOhAvbuAX1oT-MZhyr40oj3mVJDPNm_C/pub?output=csv";
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGCifHK8iAmkBIUDS09dayr2G3xh7zzp8wwRVD1EfUk6VCOi_iRnZR2ieaBCB8VrgewVqBC8zTVF22/pub?output=csv";
+
 const params = new URLSearchParams(window.location.search);
-const customerId = params.get("id");
+const customerId = params.get("id") || "c1";
+
 let arStarted = false;
 let currentScene = null;
 
@@ -478,10 +485,10 @@ function parseCSV(text) {
       i++;
     } else if (char === '"') {
       insideQuotes = !insideQuotes;
-    } else if (char === ',' && !insideQuotes) {
+    } else if (char === "," && !insideQuotes) {
       row.push(current.trim());
       current = "";
-    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
       if (current || row.length) {
         row.push(current.trim());
         rows.push(row);
@@ -499,6 +506,7 @@ function parseCSV(text) {
   }
 
   const headers = rows.shift().map(h => h.trim());
+
   return rows.filter(r => r.length && r.some(Boolean)).map(r => {
     const obj = {};
     headers.forEach((h, i) => obj[h] = (r[i] || "").trim());
@@ -513,49 +521,51 @@ function absolutePath(path) {
 }
 
 async function getCustomerData() {
-  if (!customerId) throw new Error("missing-id");
   const response = await fetch(SHEET_CSV_URL + "&cache=" + Date.now());
   const csv = await response.text();
   const rows = parseCSV(csv);
-  const customer = rows.find(r => r.id === customerId);
+
+  const customer = rows.find(r =>
+    r.customerId === customerId &&
+    String(r.status || "").toLowerCase() === "active"
+  );
+
   if (!customer) throw new Error("customer-not-found");
   return customer;
 }
 
 async function loadLandingPreview() {
-  if (!customerId) return;
   try {
     const customer = await getCustomerData();
+
     const preview = document.getElementById("customerPreview");
     const title = document.getElementById("previewTitle");
     const text = document.getElementById("previewText");
+    const subtitle = document.getElementById("landingSubtitle");
 
     if (customer.title) title.innerText = customer.title;
-    text.innerText = "Point your camera at this invitation and experience the celebration in AR.";
+    if (customer.subtitle) {
+      text.innerText = customer.subtitle;
+      subtitle.innerText = customer.subtitle;
+    }
 
-    if (customer.targetImage) {
-      preview.style.backgroundImage = `linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.6)), url('${absolutePath(customer.targetImage)}')`;
+    if (customer.imageUrl) {
+      preview.style.backgroundImage =
+        `linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.6)), url('${absolutePath(customer.imageUrl)}')`;
       preview.classList.add("has-customer-image");
     }
-  } catch (e) {}
+  } catch (e) {
+    console.log("Preview not loaded:", e.message);
+  }
 }
 
 async function startARFromLanding() {
   if (arStarted) return;
 
-  if (!customerId) {
-    showError(`
-      <div>
-        <h2>Customer ID Missing</h2>
-        <p>Use link like:<br><b>https://scanstories.in/?id=rahul-reception</b></p>
-      </div>
-    `);
-    return;
-  }
-
   try {
     showLoader();
     hideError();
+
     document.getElementById("website").style.display = "none";
     document.getElementById("arMode").style.display = "block";
     document.getElementById("hint").style.display = "block";
@@ -564,26 +574,30 @@ async function startARFromLanding() {
     const customer = await getCustomerData();
     createAR(customer);
     arStarted = true;
+
   } catch (err) {
-    if (err.message === "missing-id") {
-      showError("❌ Missing customer ID.<br>Use URL like: <b>?id=rahul-reception</b>");
-    } else if (err.message === "customer-not-found") {
-      showError("❌ Customer not found in Google Sheet.<br>Please check the ID column.");
-    } else {
-      showError("❌ Failed to load AR data.<br>Please check Google Sheet CSV link and hosting paths.");
-    }
+    showError(`
+      <div>
+        <h2>❌ AR data not found</h2>
+        <p>Please check:</p>
+        <p>1. customerId in URL: <b>?id=${customerId}</b></p>
+        <p>2. Google Sheet status should be <b>active</b></p>
+        <p>3. targetUrl, imageUrl, videoUrl should be valid</p>
+      </div>
+    `);
   }
 }
 
 function createAR(c) {
   document.title = c.title || "ScanStories AR";
+
   const arMode = document.getElementById("arMode");
   arMode.innerHTML = "";
 
   const scene = document.createElement("a-scene");
   currentScene = scene;
 
-  scene.setAttribute("mindar-image", `imageTargetSrc: ${absolutePath(c.targetMind)}; autoStart: true; uiScanning: true;`);
+  scene.setAttribute("mindar-image", `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true;`);
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute("renderer", "colorManagement: true");
   scene.setAttribute("vr-mode-ui", "enabled: false");
@@ -596,6 +610,7 @@ function createAR(c) {
         src="${absolutePath(c.videoUrl)}"
         preload="auto"
         loop
+        muted
         crossorigin="anonymous"
         playsinline
         webkit-playsinline>
@@ -607,8 +622,8 @@ function createAR(c) {
     <a-entity id="target" mindar-image-target="targetIndex: 0">
       <a-video
         src="#ar-video"
-        width="${c.width || 1}"
-        height="${c.height || 0.6}"
+        width="1"
+        height="0.6"
         position="0 0 0"
         rotation="0 0 0">
       </a-video>
@@ -624,7 +639,9 @@ function createAR(c) {
   const video = scene.querySelector("#ar-video");
   const target = scene.querySelector("#target");
 
-  scene.addEventListener("arReady", () => hideLoader());
+  scene.addEventListener("arReady", () => {
+    hideLoader();
+  });
 
   scene.addEventListener("arError", () => {
     showError("❌ Camera failed to start.<br>Please allow camera permission and open using HTTPS.");
@@ -632,7 +649,11 @@ function createAR(c) {
 
   target.addEventListener("targetFound", async () => {
     document.getElementById("hint").innerText = "✨ AR video playing";
-    try { await video.play(); } catch (e) {}
+    try {
+      await video.play();
+    } catch (e) {
+      console.log("Video play blocked:", e);
+    }
   });
 
   target.addEventListener("targetLost", () => {
@@ -651,13 +672,16 @@ function closeAR() {
   document.getElementById("hint").style.display = "none";
   document.getElementById("fallbackBtn").style.display = "none";
   document.getElementById("closeAR").style.display = "none";
+
   hideLoader();
   hideError();
+
   arStarted = false;
   currentScene = null;
 }
 
 loadLandingPreview();
 </script>
+
 </body>
 </html>
