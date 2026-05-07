@@ -270,7 +270,7 @@
       z-index: 10000;
     }
 
-    #loader, #errorBox, #hint, #fallbackBtn, #closeAR {
+    #loader, #errorBox, #hint, #closeAR {
       position: fixed;
       z-index: 10001;
     }
@@ -310,19 +310,7 @@
       display: none;
       white-space: nowrap;
     }
-
-    #fallbackBtn {
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--gold), #fff1bf);
-      color: #2b1608;
-      padding: 13px 18px;
-      border-radius: 999px;
-      font-weight: 800;
-      display: none;
-    }
-
+    
     #closeAR {
       top: 18px;
       right: 18px;
@@ -578,7 +566,6 @@
   <div id="loader">✨ Loading your AR experience...</div>
   <div id="hint">📸 Point your camera at the invitation</div>
   <div id="errorBox"></div>
-  <a id="fallbackBtn" href="#" target="_blank">▶ Play Video Without AR</a>
   <button id="closeAR" onclick="closeAR()">×</button>
 
 <script>
@@ -814,11 +801,7 @@ function createAR(c) {
   `;
 
   arMode.appendChild(scene);
-
-  const fallback = document.getElementById("fallbackBtn");
-  fallback.href = absolutePath(c.videoUrl);
-  fallback.style.display = "block";
-
+  
   const video = scene.querySelector("#ar-video");
   const target = scene.querySelector("#target");
 
@@ -862,7 +845,6 @@ function closeAR() {
   document.getElementById("arMode").style.display = "none";
   document.getElementById("website").style.display = "block";
   document.getElementById("hint").style.display = "none";
-  document.getElementById("fallbackBtn").style.display = "none";
   document.getElementById("closeAR").style.display = "none";
 
   hideLoader();
