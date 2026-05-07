@@ -227,22 +227,39 @@
 }
 
     .step {
-      padding: 18px;
-      border-radius: 22px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.12);
-    }
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  min-height: 120px;
+}
 
     .step b {
-      display: inline-flex;
-      width: 32px;
-      height: 32px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
-      margin-bottom: 12px;
-    }
+  display: flex;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+
+  font-size: 22px;
+  font-weight: 800;
+}
+    .step h3 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.4;
+}
 
     #arMode {
       display: none;
@@ -483,7 +500,7 @@
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGCifHK8iAmkBIUDS09dayr2G3xh7zzp8wwRVD1EfUk6VCOi_iRnZR2ieaBCB8VrgewVqBC8zTVF22/pub?output=csv";
 
 const params = new URLSearchParams(window.location.search);
-const customerId = params.get("id") || "c1";
+const customerId = params.get("id");
 
 let arStarted = false;
 let currentScene = null;
@@ -575,6 +592,7 @@ async function getCustomerData() {
 
 async function loadLandingPreview() {
   try {
+    if (!customerId) return;
     const customer = await getCustomerData();
 
     const preview = document.getElementById("customerPreview");
@@ -628,7 +646,12 @@ async function startARFromLanding() {
     document.getElementById("hint").style.display = "block";
     document.getElementById("closeAR").style.display = "block";
 
-    const customer = await getCustomerData();
+    if (!customerId) {
+  showError("❌ Please open a valid customer AR link.");
+  return;
+}
+
+const customer = await getCustomerData();
     createAR(customer);
     arStarted = true;
 
