@@ -763,9 +763,9 @@ function createAR(c) {
   currentScene = scene;
 
   scene.setAttribute(
-    "mindar-image",
-    `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 10;`
-  );
+  "mindar-image",
+  `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true; filterMinCF: 0.00001; filterBeta: 0.0001; warmupTolerance: 8; missTolerance: 15; maxTrack: 1;`
+);
 
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute("renderer", "colorManagement: true");
@@ -794,7 +794,7 @@ function createAR(c) {
         height="1.5"
         position="0 0 0"
         rotation="0 0 0"
-        material="shader: flat;">
+        material="shader: flat; transparent: true;">
       </a-video>
     </a-entity>
   `;
