@@ -181,37 +181,6 @@
       flex-direction: column;
       justify-content: flex-end;
     }
-  #waShareBtn {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-
-  width: 58px;
-  height: 58px;
-
-  border-radius: 50%;
-
-  background: #25D366;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  box-shadow: 0 10px 30px rgba(37,211,102,.45);
-
-  z-index: 9999;
-
-  transition: transform .2s ease;
-}
-
-#waShareBtn:hover {
-  transform: scale(1.08);
-}
-
-#waShareBtn img {
-  width: 30px;
-  height: 30px;
-}
     .phone-screen.has-customer-image {
       background-size: cover;
       background-position: center;
@@ -643,7 +612,7 @@
   <div class="footer-links">
 
     <a href="https://wa.me/918142466321" target="_blank">
-      📱 +91 81424 66321
+      📱 Whatsapp +91 81424 66321
     </a>
 
     <a href="mailto:scanstories26@gmail.com">
@@ -664,11 +633,7 @@
   <div id="hint">📸 Point your camera at the invitation</div>
   <div id="errorBox"></div>
   <button id="closeAR" onclick="closeAR()">×</button>
-<a id="waShareBtn"
-   href="javascript:void(0)"
-   onclick="shareOnWhatsApp()">
-   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-</a>
+  
 <script>
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRGCifHK8iAmkBIUDS09dayr2G3xh7zzp8wwRVD1EfUk6VCOi_iRnZR2ieaBCB8VrgewVqBC8zTVF22/pub?output=csv";
 
