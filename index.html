@@ -381,8 +381,10 @@
         <div>
           <div class="brand"><span class="logo-dot"></span> ScanStories.in </div>
 
-          <h1>Your invitation, <span class="gradient-text">brought to life.</span></h1>
-
+          <h1>
+          <span id="heroTitle">Your invitation,</span>
+          <span id="heroHighlight" class="gradient-text">brought to life.</span>
+          </h1>
           <p class="sub" id="landingSubtitle">
             Create magical AR invitations and memory frames. Scan a QR, open the camera, point at the invitation, and watch the video play directly on the card.
           </p>
@@ -580,13 +582,21 @@ async function loadLandingPreview() {
     const text = document.getElementById("previewText");
     const subtitle = document.getElementById("landingSubtitle");
     const snapBtn = document.getElementById("snapBtn");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroHighlight = document.getElementById("heroHighlight");
 
-    if (customer.title) title.innerText = customer.title;
+   if (customer.title) title.innerText = customer.title;
 
-    if (customer.subtitle) {
-      text.innerText = customer.subtitle;
-      subtitle.innerText = customer.subtitle;
-    }
+if (customer.subtitle) {
+  text.innerText = customer.subtitle;
+  subtitle.innerText = customer.subtitle;
+}
+
+if (customer.heroTitle)
+  heroTitle.innerText = customer.heroTitle;
+
+if (customer.heroHighlight)
+  heroHighlight.innerText = customer.heroHighlight;
 
     if (customer.imageUrl) {
       preview.style.backgroundImage =
