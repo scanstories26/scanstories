@@ -786,27 +786,26 @@ function createAR(c) {
   scene.innerHTML = `
     <a-assets>
       <video id="ar-video"
-        src="${absolutePath(c.videoUrl)}"
-        preload="auto"
-        loop
-        crossorigin="anonymous"
-        playsinline
-        webkit-playsinline>
-      </video>
+  src="${absolutePath(c.videoUrl)}"
+  preload="auto"
+  loop
+  crossorigin="anonymous"
+  playsinline
+  webkit-playsinline>
+</video>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="target" mindar-image-target="targetIndex: 0">
       <a-video
-    id="arVideo"
-    src="#video"
-    width="1"
-    height="1.77"
-    position="0 0 0.01"
-    rotation="0 0 0"
-    material="shader: flat;"
-  ></a-video>
+  src="#ar-video"
+  width="1"
+  height="1.5"
+  position="0 0 0.001"
+  rotation="0 0 0"
+  material="shader: flat;">
+</a-video>
     </a-entity>
   `;
 
@@ -828,15 +827,22 @@ function createAR(c) {
   });
 
   target.addEventListener("targetFound", async () => {
-    document.getElementById("hint").innerText = "✨ AR video playing";
-    try {
+  document.getElementById("hint").innerText = "✨ AR video playing";
+
+  try {
+    video.currentTime = video.currentTime || 0;
+    video.muted = true;
+    await video.play();
+
+    setTimeout(() => {
       video.muted = false;
       video.volume = 1;
-      await video.play();
-    } catch (e) {
-      console.log("Video play blocked:", e);
-    }
-  });
+    }, 300);
+
+  } catch (e) {
+    console.log("Video play blocked:", e);
+  }
+});
 
   target.addEventListener("targetLost", () => {
     document.getElementById("hint").innerText = "📸 Point your camera at the invitation";
