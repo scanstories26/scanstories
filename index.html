@@ -795,7 +795,11 @@ function createAR(c) {
 </video>
     </a-assets>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-camera
+  position="0 0 0"
+  look-controls="enabled: false"
+  camera="near: 0.01; far: 10000;">
+</a-camera>
 
     <a-entity id="target" mindar-image-target="targetIndex: 0">
       <a-video
