@@ -385,14 +385,29 @@
       <div class="shell">
         <div>
           <div class="brand"><span class="logo-dot"></span> ScanStories AR</div>
+
           <h1>Your invitation, <span class="gradient-text">brought to life.</span></h1>
+
           <p class="sub" id="landingSubtitle">
             Create magical AR invitations and memory frames. Scan a QR, open the camera, point at the invitation, and watch the video play directly on the card.
           </p>
 
           <div class="actions">
-            <button class="btn btn-primary" onclick="startARFromLanding()">Open AR Experience ✨</button>
-            <a class="btn btn-secondary" href="https://www.instagram.com/scanstories.in/" target="_blank">
+            <button class="btn btn-primary" onclick="startARFromLanding()">
+              Open WebAR Experience ✨
+            </button>
+
+            <a id="snapBtn"
+               class="btn btn-secondary"
+               href="#"
+               target="_blank"
+               style="display:none;">
+              👻 Open in Snapchat
+            </a>
+
+            <a class="btn btn-secondary"
+               href="https://www.instagram.com/scanstories.in/"
+               target="_blank">
               <span>📸</span>
               <span>@scanstories.in</span>
             </a>
@@ -542,8 +557,10 @@ async function loadLandingPreview() {
     const title = document.getElementById("previewTitle");
     const text = document.getElementById("previewText");
     const subtitle = document.getElementById("landingSubtitle");
+    const snapBtn = document.getElementById("snapBtn");
 
     if (customer.title) title.innerText = customer.title;
+
     if (customer.subtitle) {
       text.innerText = customer.subtitle;
       subtitle.innerText = customer.subtitle;
@@ -554,6 +571,14 @@ async function loadLandingPreview() {
         `linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.6)), url('${absolutePath(customer.imageUrl)}')`;
       preview.classList.add("has-customer-image");
     }
+
+    if (customer.snapLink) {
+      snapBtn.href = customer.snapLink;
+      snapBtn.style.display = "inline-flex";
+    } else {
+      snapBtn.style.display = "none";
+    }
+
   } catch (e) {
     console.log("Preview not loaded:", e.message);
   }
@@ -598,9 +623,10 @@ function createAR(c) {
   currentScene = scene;
 
   scene.setAttribute(
-  "mindar-image",
-  `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 10;`
-);
+    "mindar-image",
+    `imageTargetSrc: ${absolutePath(c.targetUrl)}; autoStart: true; uiScanning: true; filterMinCF: 0.0001; filterBeta: 0.001; warmupTolerance: 5; missTolerance: 10;`
+  );
+
   scene.setAttribute("color-space", "sRGB");
   scene.setAttribute("renderer", "colorManagement: true");
   scene.setAttribute("vr-mode-ui", "enabled: false");
@@ -627,7 +653,8 @@ function createAR(c) {
         width="1"
         height="1.5"
         position="0 0 0"
-        rotation="0 0 0">
+        rotation="0 0 0"
+        material="shader: flat;">
       </a-video>
     </a-entity>
   `;
