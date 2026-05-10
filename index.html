@@ -824,11 +824,11 @@ function createAR(c) {
   autoStart: true;
   uiScanning: true;
   uiLoading: true;
-  maxTrack: 1;
-  filterMinCF: 1;
-  filterBeta: 0.0005;
-  warmupTolerance: 25;
-  missTolerance: 5;
+  maxTrack: 1;          /* Reduced jitter settings below */
+  filterMinCF: 0.0001;  /* Lowering this significantly reduces jitter */
+  filterBeta: 0.001;    /* Adjusts how much the filter follows movement */
+  warmupTolerance: 5;   /* Detects faster */
+  missTolerance: 10;    /* Keeps video visible longer if camera moves away */
   `
 );
 
