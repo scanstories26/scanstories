@@ -36,27 +36,6 @@
       overflow-x: hidden;
     }
 
-#snapHint{
-  position: fixed;
-  bottom: 110px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-
-  background: rgba(0,0,0,0.75);
-  color: white;
-
-  padding: 12px 18px;
-  border-radius: 30px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  backdrop-filter: blur(10px);
-
-  animation: floatAnim 2s ease-in-out infinite;
-}
-
 @keyframes floatAnim{
   0%{
     transform: translateX(-50%) translateY(0px);
@@ -559,10 +538,7 @@
           </h1>
           <p class="sub" id="landingSubtitle">
             Transform photos, invitations, and memories into immersive interactive AR experiences.
-          </p>
-          <div id="snapHint" onclick="openSnap()">
-  👻 For better AR experience, use Snapchat
-</div>
+        
           <div class="actions">
             <button class="btn btn-primary" onclick="startARFromLanding()">
               Open WebAR Experience ✨
@@ -615,7 +591,7 @@
 
     <div class="howto-item">
       <div class="howto-number">1</div>
-      <div class="howto-text">Open in Snapchat</div>
+      <div class="howto-text">Open in Snapchat (For better AR experience)</div>
     </div>
 
     <div class="howto-item">
